@@ -102,6 +102,7 @@
     NSString* type =  [command argumentAtIndex:2 withDefault:@"A4"];
     NSString* _landscape =  [command argumentAtIndex:3 withDefault:@"portrait"];
     NSString* option = [command argumentAtIndex:4 withDefault:@"base64"];
+    NSMutableString* footerTextParam = [command argumentAtIndex:6 withDefault:@" "];
 
     
     BNPageSize pageSize;
@@ -129,10 +130,11 @@
     
     if (data != NULL)
         self.htmlPdfKit = [BNHtmlPdfKit saveHTMLAsPdf:data
-                                             pageSize:pageSize
-                                          isLandscape:landscape
-                                              success:[self GetPDFHandler:command setOptions:option]
-                                              failure:[self GetErrorHandler:command]];
+                                        pageSize:pageSize
+                                        isLandscape:landscape
+                                        success:[self GetPDFHandler:command setOptions:option]
+                                        failure:[self GetErrorHandler:command]
+                                        footerText: footerTextParam];
 }
 
 

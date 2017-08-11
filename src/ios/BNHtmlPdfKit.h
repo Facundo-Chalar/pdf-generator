@@ -93,6 +93,8 @@ Left and Right page margins.
 */
 @property (nonatomic, assign) CGFloat leftAndRightMarginSize;
 
+@property (nonatomic, strong) NSMutableString *footerTextParam;
+
 /**
 Base URL to use.
 */
@@ -253,9 +255,10 @@ Creates a BNHtmlPdfKit object to save a URL as PDF with BNPageSize.
  @param leftAndRight Left and right margin size.
  @param completion Block to be notified when PDF file is generated.
  @param failure Block to be notified of failure.
+ @param Footer that we want to be displayed on printed pages
  **/
 
-+(BNHtmlPdfKit *)saveHTMLAsPdf:(NSString *)html pageSize:(BNPageSize)pageSize isLandscape:(BOOL)landscape  success:(void (^)(NSData *))completion failure:(void (^)(NSError *))failure;
++(BNHtmlPdfKit *)saveHTMLAsPdf:(NSString *)html pageSize:(BNPageSize)pageSize isLandscape:(BOOL)landscape  success:(void (^)(NSData *))completion failure:(void (^)(NSError *))failure footerText:(NSMutableString *)footerTextParam;
 
 
 
@@ -276,7 +279,9 @@ Initializes BNHtmlPdfKit with a BNPageSize.
 
 @return An initialized `BNHtmlPdfKit` object.
 */
-- (id)initWithPageSize:(BNPageSize)pageSize isLandscape:(BOOL)landscape;
+- (id)initWithPageSize:(BNPageSize)pageSize isLandscape:(BOOL)landscape ;
+
+- (id)initWithPageSize:(BNPageSize)pageSize isLandscape:(BOOL)landscape footerText:(NSMutableString *)footerTextParam;
 
 /**
 Initializes BNHtmlPdfKit with a custom page size.

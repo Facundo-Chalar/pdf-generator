@@ -11,7 +11,8 @@ module.exports = {
          var landscape = options.landscape || "portrait";
          var type = options.type || "base64";
          var fileName = options.fileName || "default";
+         var footerText =options.footerText || "";
         
-        cordova.exec(successCallback, errorCallback, "PDFService", "htmlToPDF", [ url, data, docSize, landscape, type, fileName ]);
+        cordova.exec(successCallback, errorCallback, "PDFService", "htmlToPDF", [ url, data, docSize, landscape, type, fileName, footerText ]);
     }
 };

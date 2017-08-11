@@ -17,6 +17,7 @@
 
 @property (nonatomic, assign) CGFloat topAndBottomMarginSize;
 @property (nonatomic, assign) CGFloat leftAndRightMarginSize;
+@property (nonatomic, strong) NSMutableString *footerTextParam;
 
 @end
 
@@ -31,6 +32,26 @@
 
 - (CGRect)printableRect {
 	return CGRectInset([self paperRect], self.leftAndRightMarginSize, self.topAndBottomMarginSize);
+}
+
+//Este metodo solo se ejecuta si setFooterHeight > 0.0
+- (void)drawFooterForPageAtIndex:(NSInteger)pageIndex
+                          inRect:(CGRect)footerRect
+{
+	NSLog(@"agregando footer");
+	UIFont *font = [UIFont fontWithName:@"Helvetica" size:9];
+    NSString *pageNumber = [NSString stringWithFormat:@"- %d -", pageIndex+1];
+  
+
+  	NSLog(@"El footer de self es: %@",self.footerTextParam);
+  	NSString *testString = self.footerTextParam;
+  	CGSize size = [testString sizeWithFont:font];
+    CGFloat drawX = CGRectGetMaxX(footerRect)/2 - size.width/2;
+    CGFloat drawY = CGRectGetMaxY(footerRect) - size.height - 5;
+    CGPoint drawPoint = CGPointMake(drawX, drawY);
+	[testString drawAtPoint:drawPoint withFont:font];
+	
+
 }
 
 @end
@@ -51,6 +72,8 @@
 @property (nonatomic, copy) void (^dataCompletionBlock)(NSData *pdfData);
 @property (nonatomic, copy) void (^fileCompletionBlock)(NSString *pdfFileName);
 @property (nonatomic, copy) void (^failureBlock)(NSError * error);
+
+
 
 @end
 
@@ -104,9 +127,10 @@
 
 }
 
-+(BNHtmlPdfKit *)saveHTMLAsPdf:(NSString *)html pageSize:(BNPageSize)pageSize isLandscape:(BOOL)landscape  success:(void (^)(NSData *))completion failure:(void (^)(NSError *))failure{
++(BNHtmlPdfKit *)saveHTMLAsPdf:(NSString *)html pageSize:(BNPageSize)pageSize isLandscape:(BOOL)landscape  success:(void (^)(NSData *))completion failure:(void (^)(NSError *))failure footerText:(NSMutableString *)footerTextParam{
     
-    BNHtmlPdfKit *pdfKit = [[BNHtmlPdfKit alloc] initWithPageSize:pageSize isLandscape:landscape];
+   	NSLog(@"Footer recibido: %@",footerTextParam);
+    BNHtmlPdfKit *pdfKit = [[BNHtmlPdfKit alloc] initWithPageSize:pageSize isLandscape:landscape footerText:footerTextParam];
     pdfKit.dataCompletionBlock = completion;
     pdfKit.failureBlock = failure;
     
@@ -211,6 +235,19 @@
 	if (self = [super init]) {
 		self.pageSize = pageSize;
 		self.landscape = landscape;
+
+		// Default 1/4" margins
+		self.topAndBottomMarginSize = 0.25f * 72.0f;
+		self.leftAndRightMarginSize = 0.25f * 72.0f;
+	}
+	return self;
+}
+
+- (id)initWithPageSize:(BNPageSize)pageSize isLandscape:(BOOL)landscape footerText:(NSMutableString *)footerTextParam{
+	if (self = [super init]) {
+		self.pageSize = pageSize;
+		self.landscape = landscape;
+		self.footerTextParam = footerTextParam;
 
 		// Default 1/4" margins
 		self.topAndBottomMarginSize = 0.25f * 72.0f;
@@ -456,6 +493,9 @@
 	BNHtmlPdfKitPageRenderer *renderer = [[BNHtmlPdfKitPageRenderer alloc] init];
 	renderer.topAndBottomMarginSize = self.topAndBottomMarginSize;
 	renderer.leftAndRightMarginSize = self.leftAndRightMarginSize;
+	renderer.footerTextParam = self.footerTextParam;
+
+	[renderer setFooterHeight:3.0f];
 
 	[renderer addPrintFormatter:formatter startingAtPageAtIndex:0];
 
@@ -469,7 +509,6 @@
 	[renderer prepareForDrawingPages:NSMakeRange(0, 1)];
 
 	NSInteger pages = [renderer numberOfPages];
-
 	for (NSInteger i = 0; i < pages; i++) {
 		UIGraphicsBeginPDFPage();
 		[renderer drawPageAtIndex:i inRect:renderer.paperRect];
